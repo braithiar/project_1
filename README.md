@@ -1,2 +1,3 @@
-# project_1
-Revature project 1 using Spring.
+# Expense Reimbursement System
+## Revature Project 1
+Created with Spring.
