@@ -16,12 +16,12 @@ public class Reimbursement {
   @Column(nullable = false)
   private String description;
 
-  @Column(name = "user_fk")
-  @ManyToOne
+  @JoinColumn(name = "user_fk", referencedColumnName = "user_id")
+  @ManyToOne(targetEntity = User.class)
   private int userID;
 
-  @Column(name = "status_fk")
-  @ManyToOne
+  @JoinColumn(name = "status_fk", referencedColumnName = "status_id")
+  @ManyToOne(targetEntity = Status.class)
   private int statusID;
 
   public Reimbursement() {

@@ -22,8 +22,8 @@ public class User {
   @Column(nullable = false)
   private String password;
 
-  @Column(name = "role_fk")
-  @ManyToOne
+  @JoinColumn(name = "role_fk", referencedColumnName = "role_id")
+  @ManyToOne(targetEntity = Role.class)
   private int roleID;
 
   public User() {
