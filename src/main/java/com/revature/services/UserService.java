@@ -1,6 +1,8 @@
 package com.revature.services;
 
+import com.revature.dao.RoleDAO;
 import com.revature.dao.UserDAO;
+import com.revature.models.Role;
 import com.revature.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,10 +13,12 @@ import java.util.Optional;
 @Service
 public class UserService {
   private final UserDAO userDAO;
+  private final RoleDAO roleDAO;
 
   @Autowired
-  public UserService(UserDAO userDAO) {
+  public UserService(UserDAO userDAO, RoleDAO roleDAO) {
     this.userDAO = userDAO;
+    this.roleDAO = roleDAO;
   }
 
   public User addUser(User user) {
@@ -54,6 +58,21 @@ public class UserService {
     }
 
     // TODO: log failure
+    return null;
+  }
+
+  public Role getUserRoleById(int uid) {
+    Optional<User> returnedUser = userDAO.findById(uid);
+
+    if (returnedUser.isPresent()) {
+      Optional<Role> returnedRole =
+        roleDAO.findById(returnedUser.get().getRoleID());
+
+      if (returnedRole.isPresent()) {
+        return returnedRole.get();
+      }
+    }
+
     return null;
   }
 
