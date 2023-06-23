@@ -66,7 +66,7 @@ public class UserService {
 
     if (returnedUser.isPresent()) {
       Optional<Role> returnedRole =
-        roleDAO.findById(returnedUser.get().getRoleID());
+        roleDAO.findById(returnedUser.get().getRole().getId());
 
       if (returnedRole.isPresent()) {
         return returnedRole.get();

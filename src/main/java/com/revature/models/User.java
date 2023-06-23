@@ -22,21 +22,28 @@ public class User {
   @Column(nullable = false)
   private String password;
 
-  @JoinColumn(name = "role_fk", referencedColumnName = "role_id")
-  @ManyToOne(targetEntity = Role.class)
-  private int roleID;
+  @ManyToOne
+  private Role role;
 
   public User() {
   }
 
+  public User(String firstName, String lastName, String username,
+              String password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.username = username;
+    this.password = password;
+  }
+
   public User(int id, String firstName, String lastName, String username,
-              String password, int roleID) {
+              String password, Role role) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
     this.password = password;
-    this.roleID = roleID;
+    this.role = role;
   }
 
   public int getId() {
@@ -79,11 +86,11 @@ public class User {
     this.password = password;
   }
 
-  public int getRoleID() {
-    return roleID;
+  public Role getRole() {
+    return role;
   }
 
-  public void setRoleID(int roleID) {
-    this.roleID = roleID;
+  public void setRole(Role role) {
+    this.role = role;
   }
 }

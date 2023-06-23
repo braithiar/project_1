@@ -36,7 +36,7 @@ public class CustomUDService implements UserDetailsService {
     return new org.springframework.security.core.userdetails.User(
       u.getUsername(),
       u.getPassword(),
-      mapRoleToAuthority(roleDAO.findById(u.getRoleID()).get())
+      mapRoleToAuthority(roleDAO.findById(u.getRole().getId()).get())
     );
   }
 
