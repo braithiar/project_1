@@ -16,11 +16,12 @@ public class Reimbursement {
   @Column(nullable = false)
   private String description;
 
-  @JoinColumn(name = "user_fk", referencedColumnName = "user_id")
+  @JoinColumn(name = "user_fk", referencedColumnName = "user_id", nullable = false)
   @ManyToOne(targetEntity = User.class)
   private int userID;
 
-  @JoinColumn(name = "status_fk", referencedColumnName = "status_id")
+  // TODO: update reimbursement model to contain a Status object instead of sid
+  @JoinColumn(name = "status_fk", referencedColumnName = "status_id", nullable = false)
   @ManyToOne(targetEntity = Status.class)
   private int statusID;
 

@@ -3,6 +3,7 @@ package com.revature.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,6 +41,13 @@ public class SecurityConfig {
       .and()
       .authorizeRequests()
       .antMatchers("/auth/**").permitAll()
+      .antMatchers("/users/**").hasAuthority("Employee")
+      .antMatchers(HttpMethod.GET, "/reimbursements/**").hasAuthority("Finance Manager")
+      .antMatchers(HttpMethod.PUT, "/reimbursements/**").hasAuthority("Finance Manager")
+      .antMatchers(HttpMethod.POST, "/reimbursements/employee/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers(HttpMethod.GET, "/reimbursements/employee/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers(HttpMethod.DELETE, "/reimbursements/employee/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers("**").denyAll()
       .and()
       .httpBasic();
 
