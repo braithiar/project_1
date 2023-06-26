@@ -8,29 +8,17 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "reimbursements")
+@Table(name = "expense_types")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Reimbursement {
+public class ExpenseType {
   @Id
-  @Column(name = "reimb_id")
+  @Column(name = "type_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
   @Column(nullable = false)
-  private int amount;
-
-  @Column(nullable = false)
-  private String description;
-
-  @ManyToOne(targetEntity = User.class)
-  private User user;
-
-  @ManyToOne(targetEntity = ExpenseType.class)
-  private ExpenseType type;
-
-  @ManyToOne(targetEntity = Status.class)
-  private Status status;
+  private String type;
 }

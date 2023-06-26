@@ -68,4 +68,15 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(RoleDoesNotExistException.class)
+  public ResponseEntity<?> handleRoleDNEException(
+    RoleDoesNotExistException rdnee, WebRequest wr) {
+    Map<String, Object> body = new HashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", "Role does not exist");
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
 }

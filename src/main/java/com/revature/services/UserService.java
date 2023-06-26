@@ -2,6 +2,7 @@ package com.revature.services;
 
 import com.revature.dao.RoleDAO;
 import com.revature.dao.UserDAO;
+import com.revature.exceptions.RoleDoesNotExistException;
 import com.revature.exceptions.UserDoesNotExistException;
 import com.revature.models.Role;
 import com.revature.models.User;
@@ -69,10 +70,12 @@ public class UserService {
 
       if (returnedRole.isPresent()) {
         return returnedRole.get();
+      } else {
+        throw new RoleDoesNotExistException();
       }
     }
 
-    return null;
+    throw new UserDoesNotExistException(uid);
   }
 
   public boolean deleteUser(int uid) {
