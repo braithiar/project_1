@@ -55,9 +55,13 @@ public class ReimbursementService {
       throw new EmptyDescriptionException();
     }
 
-    if (r.getType().getId() <= 0) {
+    if (r.getType() == null ||
+        !expenseTypeDAO.existsById(r.getType().getId()) ||
+        expenseTypeDAO.findByType(r.getType().getType()).getId() !=
+        r.getType().getId()) {
       throw new TypeDoesNotExistException();
     }
+
 
     newReimbursement = reimbDAO.save(r);
 
@@ -94,7 +98,7 @@ public class ReimbursementService {
       throw new TypeDoesNotExistException();
     }
 
-    return reimbDAO.findByUserAndExpenseType(
+    return reimbDAO.findByUserAndType(
       user,
       type
     );
@@ -121,14 +125,22 @@ public class ReimbursementService {
       throw new TypeDoesNotExistException();
     }
 
-    return reimbDAO.findByExpenseType(type);
+    return reimbDAO.findByType(type);
   }
 
   public List<Reimbursement> getAllReimbursements() {
     return reimbDAO.findAll();
   }
 
-  public Reimbursement updateReimbursement(Reimbursement r) {
-    return reimbDAO.save(r);
+  public Reimbursement updateReimbursementStatus(Reimbursement r) {
+    Status origStatus = reimbDAO.getReferenceById(r.getId()).getStatus();
+
+    // Reimbursements may not be edited after being processed
+    if (r != null && origStatus.getName() != "Approved" ||
+        origStatus.getName() != "Denied") {
+      return reimbDAO.save(r);
+    }
+
+    throw new FailedStatusUpdateException();
   }
 }

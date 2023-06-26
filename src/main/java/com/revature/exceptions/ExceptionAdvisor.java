@@ -82,11 +82,33 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(TypeDoesNotExistException.class)
   public ResponseEntity<?> handleTypeDNEException(
-    RoleDoesNotExistException rdnee, WebRequest wr) {
+    TypeDoesNotExistException rdnee, WebRequest wr) {
     Map<String, Object> body = new HashMap<>();
 
     body.put("timestamp", LocalDateTime.now());
     body.put("message", "Type does not exist");
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(NoTokenException.class)
+  public ResponseEntity<?> handleTypeDNEException(
+    NoTokenException nte, WebRequest wr) {
+    Map<String, Object> body = new HashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", "Token could not be retrieved");
+
+    return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(FailedStatusUpdateException.class)
+  public ResponseEntity<?> handleTypeDNEException(
+    FailedStatusUpdateException fsue, WebRequest wr) {
+    Map<String, Object> body = new HashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", "Could not update reimbursement status");
 
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }

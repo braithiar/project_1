@@ -46,9 +46,9 @@ public class SecurityConfig {
       .antMatchers(HttpMethod.PUT, "/reimbursements/**").hasAuthority("Finance Manager")
       .antMatchers(HttpMethod.POST, "/reimbursements/**").hasAuthority("Finance Manager")
       .antMatchers(HttpMethod.DELETE, "/reimbursements/**").hasAuthority("Finance Manager")
-      .antMatchers(HttpMethod.POST, "/{uid}/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
-      .antMatchers(HttpMethod.GET, "/{uid}/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
-      .antMatchers(HttpMethod.DELETE, "/{uid}/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers(HttpMethod.POST, "/employee/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers(HttpMethod.GET, "/employee/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
+      .antMatchers(HttpMethod.DELETE, "/employee/reimbursements/**").hasAnyAuthority("Finance Manager", "Employee")
       .antMatchers("**").denyAll()
       .and()
       .httpBasic();

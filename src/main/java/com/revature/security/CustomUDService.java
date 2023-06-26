@@ -30,9 +30,12 @@ public class CustomUDService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws
     UsernameNotFoundException {
-    User u = userDAO.findByUsername(username).orElseThrow(
-      () -> new UsernameNotFoundException(
-        "Could not find username: " + username));
+    User u = userDAO.findByUsername(username);
+
+    if (u == null) {
+      new UsernameNotFoundException("Could not find username: " + username);
+    }
+
     return new org.springframework.security.core.userdetails.User(
       u.getUsername(),
       u.getPassword(),

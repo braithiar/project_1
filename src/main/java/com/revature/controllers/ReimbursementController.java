@@ -3,13 +3,15 @@ package com.revature.controllers;
 import com.revature.dao.ExpenseTypeDAO;
 import com.revature.dao.StatusDAO;
 import com.revature.models.Reimbursement;
+import com.revature.models.Status;
+import com.revature.models.User;
 import com.revature.security.TokenGenerator;
 import com.revature.services.ReimbursementService;
 import com.revature.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping()
@@ -23,7 +25,8 @@ public class ReimbursementController {
   @Autowired
   public ReimbursementController(ReimbursementService reimbService,
                                  UserService userService, StatusDAO statusDAO,
-                                 ExpenseTypeDAO expenseTypeDAO, TokenGenerator tokenGenerator) {
+                                 ExpenseTypeDAO expenseTypeDAO,
+                                 TokenGenerator tokenGenerator) {
     this.reimbService = reimbService;
     this.userService = userService;
     this.statusDAO = statusDAO;
@@ -31,100 +34,212 @@ public class ReimbursementController {
     this.tokenGenerator = tokenGenerator;
   }
 
-  @GetMapping("{uid}/reimbursements")
-  public List<Reimbursement> getAllUserReimbursementsHandler(
-    @PathVariable("uid") int uid) {
-    return reimbService.getAllUserReimbursements(
-      userService.getUserById(uid)
-    );
+  @GetMapping("/employee/reimbursements")
+  public ResponseEntity<?> getAllUserReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getAllUserReimbursements(user),
+                                HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/pending")
-  public List<Reimbursement> getUserPendingReimbursementsHandler(
-    @PathVariable("uid") int uid) {
-    return reimbService.getUserReimbursementsByStatus(
-      userService.getUserById(uid),
+  @GetMapping("/employee/reimbursements/pending")
+  public ResponseEntity<?> getUserPendingReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByStatus(
+      user,
       statusDAO.findByName("Pending")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/approved")
-  public List<Reimbursement> getUserApprovedReimbursementsHandler(
-    @PathVariable("uid") int uid) {
-    return reimbService.getUserReimbursementsByStatus(
-      userService.getUserById(uid),
+  @GetMapping("/employee/reimbursements/approved")
+  public ResponseEntity<?> getUserApprovedReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByStatus(
+      user,
       statusDAO.findByName("Approved")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/denied")
-  public List<Reimbursement> getUserDeniedReimbursementsHandler(
-    @PathVariable("uid") int uid) {
-    return reimbService.getUserReimbursementsByStatus(
-      userService.getUserById(uid),
+  @GetMapping("/employee/reimbursements/denied")
+  public ResponseEntity<?> getUserDeniedReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByStatus(
+      user,
       statusDAO.findByName("Denied")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("reimbursements")
-  public List<Reimbursement> getAllReimbursementsHandler() {
-    return reimbService.getAllReimbursements();
+  @GetMapping("/reimbursements")
+  public ResponseEntity<?> getAllReimbursementsHandler(
+    @RequestParam(value = "id", required = false) Integer uid) {
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getAllUserReimbursements(userService.getUserById(uid)),
+        HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(reimbService.getAllReimbursements(),
+                                HttpStatus.OK);
   }
 
-  @GetMapping("reimbursements/pending")
-  public List<Reimbursement> getAllPendingReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByStatus(
-      statusDAO.findByName("Pending")
-    );
+  @GetMapping("/reimbursements/pending")
+  public ResponseEntity<?> getAllPendingReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    Status status = statusDAO.findByName("Pending");
+
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getUserReimbursementsByStatus(
+          userService.getUserById(uid),
+          status
+        ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(
+      reimbService.getAllReimbursementsByStatus(status), HttpStatus.OK);
   }
 
-  @GetMapping("reimbursements/approved")
-  public List<Reimbursement> getAllApprovedReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByStatus(
-      statusDAO.findByName("Approved")
-    );
+  @GetMapping("/reimbursements/approved")
+  public ResponseEntity<?> getAllApprovedReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    Status status = statusDAO.findByName("Approved");
+
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getUserReimbursementsByStatus(
+          userService.getUserById(uid),
+          status
+        ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(
+      reimbService.getAllReimbursementsByStatus(status), HttpStatus.OK);
   }
 
-  @GetMapping("reimbursements/denied")
-  public List<Reimbursement> getAllDeniedReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByStatus(
-      statusDAO.findByName("Denied")
-    );
+  @GetMapping("/reimbursements/denied")
+  public ResponseEntity<?> getAllDeniedReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    Status status = statusDAO.findByName("Denied");
+
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getUserReimbursementsByStatus(
+          userService.getUserById(uid),
+          status
+        ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(
+      reimbService.getAllReimbursementsByStatus(status), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/travel")
-  public List<Reimbursement> getAllTravelReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByType(
+  @GetMapping("/reimbursements/travel")
+  public ResponseEntity<?> getAllTravelReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getUserReimbursementsByType(
+          userService.getUserById(uid),
+          expenseTypeDAO.findByType("Travel")
+        ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(reimbService.getAllReimbursementsByType(
       expenseTypeDAO.findByType("Travel")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/lodging")
-  public List<Reimbursement> getAllLodgingReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByType(
+  @GetMapping("/reimbursements/lodging")
+  public ResponseEntity<?> getAllLodgingReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(
+        reimbService.getUserReimbursementsByType(
+          userService.getUserById(uid),
+          expenseTypeDAO.findByType("Lodging")
+        ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(reimbService.getAllReimbursementsByType(
       expenseTypeDAO.findByType("Lodging")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/food")
-  public List<Reimbursement> getAllFoodReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByType(
+  @GetMapping("/reimbursements/food")
+  public ResponseEntity<?> getAllFoodReimbursementsHandler(
+    @RequestParam(name = "id", required = false) Integer uid) {
+    if (uid != null && uid > 0) {
+      return new ResponseEntity<>(reimbService.getUserReimbursementsByType(
+        userService.getUserById(uid),
+        expenseTypeDAO.findByType("Food")
+      ), HttpStatus.OK);
+    }
+    return new ResponseEntity<>(reimbService.getAllReimbursementsByType(
       expenseTypeDAO.findByType("Food")
-    );
+    ), HttpStatus.OK);
   }
 
-  @GetMapping("{uid}/reimbursements/other")
-  public List<Reimbursement> getAllOtherReimbursementsHandler() {
-    return reimbService.getAllReimbursementsByType(
+  @GetMapping("/reimbursements/other")
+  public ResponseEntity<?> getAllOtherReimbursementsHandler() {
+    return new ResponseEntity<>(reimbService.getAllReimbursementsByType(
       expenseTypeDAO.findByType("Other")
-    );
+    ), HttpStatus.OK);
   }
 
-  @PostMapping("{uid}/reimbursements")
-  public Reimbursement createReimbursementHandler(@PathVariable("uid") int uid,
-                                                  @RequestBody Reimbursement r) {
-    return reimbService.createReimbursement(uid, r);
+  @PostMapping("/employee/reimbursements/new")
+  public ResponseEntity<?> createReimbursementHandler(
+    @RequestBody Reimbursement r,
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    r.setUser(user);
+
+    return new ResponseEntity<>(reimbService.createReimbursement(
+      user.getId(),
+      r), HttpStatus.CREATED);
   }
 
-
+  @PutMapping("/reimbursements/status-update")
+  public ResponseEntity<?> updateReimbursementStatus(
+    @RequestBody Reimbursement r) {
+    return new ResponseEntity<>(reimbService.updateReimbursementStatus(r),
+                                HttpStatus.OK);
+  }
 }

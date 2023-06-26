@@ -30,8 +30,6 @@ public class TokenGenerator {
     Date current = new Date();
     Date expire = new Date(current.getTime() + expiration);
 
-    System.out.println(secretKey);
-
     return Jwts.builder()
                .setSubject(username)
                .setIssuedAt(current)
@@ -55,6 +53,10 @@ public class TokenGenerator {
   }
 
   public String getUsernameFromToken(String token) {
+    if (token != null && token.startsWith("Bearer")) {
+      token = token.substring(7);
+    }
+
     Claims claims = Jwts.parserBuilder()
       .setSigningKey(secretKey)
       .build()

@@ -61,6 +61,16 @@ public class UserService {
     throw new UserDoesNotExistException(uid);
   }
 
+  public User getUserByUsername(String username) {
+    User user = userDAO.findByUsername(username);
+
+    if (user == null) {
+      throw new UserDoesNotExistException(username);
+    }
+
+    return user;
+  }
+
   public Role getUserRoleById(int uid) {
     Optional<User> returnedUser = userDAO.findById(uid);
 
