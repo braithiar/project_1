@@ -3,7 +3,10 @@ package com.revature.services;
 import com.revature.dao.ReimbursementDAO;
 import com.revature.dao.StatusDAO;
 import com.revature.dao.UserDAO;
+import com.revature.exceptions.*;
 import com.revature.models.Reimbursement;
+import com.revature.models.Status;
+import com.revature.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,49 +26,73 @@ public class ReimbursementService {
     this.statusDAO = statusDAO;
   }
 
-  public Reimbursement submitReimbursement(Reimbursement r) {
-    int pendingId = statusDAO.getStatusIdByName("Pending");
+  public Reimbursement createReimbursement(int uid, Reimbursement r) {
+    Status pending = statusDAO.findByName("Pending");
     Reimbursement newReimbursement = null;
 
-    if (r.getStatusID() != pendingId) {
-      r.setStatusID(pendingId);
+    if (pending.getId() <= 0) {
+      throw new StatusDoesNotExistException(pending.getId());
     }
 
-    if (r.getAmount() > 0 && !r.getDescription().isEmpty() &&
-        r.getUserID() > 0) {
-      newReimbursement = reimbDAO.save(r);
+    r.setStatus(pending);
+
+    if (userDAO.existsById(uid)) {
+      r.setUser(userDAO.getReferenceById(uid));
+    } else {
+      throw new UserDoesNotExistException(uid);
     }
+
+    if (r.getAmount() <= 0) {
+      throw new NonCompliantAmountException(r.getAmount());
+    }
+
+    if (r.getDescription().isEmpty()) {
+      throw new EmptyDescriptionException();
+    }
+
+    newReimbursement = reimbDAO.save(r);
 
     if (newReimbursement.getId() > 0) {
-      // TODO: log success
       return newReimbursement;
     }
-    // TODO: log failure
-    return null;
+
+    throw new FailedReimbursementException();
   }
 
-  public List<Reimbursement> getUserPendingReimbursements(int uid) {
-    int sid = statusDAO.getStatusIdByName("Pending");
+  public List<Reimbursement> getUserReimbursementsByStatus(User user,
+                                                           Status status) {
+    if (!userDAO.existsById(user.getId())) {
+      throw new UserDoesNotExistException(user.getId());
+    }
 
-    return reimbDAO.getAllReimbursementsByUserIdAndStatusId(uid, sid);
+    if (!statusDAO.existsById(status.getId())) {
+      throw new StatusDoesNotExistException(status.getId());
+    }
+
+    return reimbDAO.findByUserAndStatus(
+      user,
+      status
+    );
   }
 
-  public List<Reimbursement> getUserApprovedReimbursements(int uid) {
-    int sid = statusDAO.getStatusIdByName("Approved");
+  public List<Reimbursement> getAllUserReimbursements(User user) {
+    if (!userDAO.existsById(user.getId())) {
+      throw new UserDoesNotExistException(user.getId());
+    }
 
-    return reimbDAO.getAllReimbursementsByUserIdAndStatusId(uid, sid);
+    return reimbDAO.findByUser(user);
   }
 
-  public List<Reimbursement> getAllPendingReimbursements() {
-    int sid = statusDAO.getStatusIdByName("Pending");
+  public List<Reimbursement> getAllReimbursementsByStatus(Status status) {
+    if (!statusDAO.existsById(status.getId())) {
+      throw new StatusDoesNotExistException(status.getId());
+    }
 
-    return reimbDAO.getAllReimbursementsByStatusId(sid);
+    return reimbDAO.findByStatus(status);
   }
 
-  public List<Reimbursement> getAllApprovedReimbursements() {
-    int sid = statusDAO.getStatusIdByName("Approved");
-
-    return reimbDAO.getAllReimbursementsByStatusId(sid);
+  public List<Reimbursement> getAllReimbursements() {
+    return reimbDAO.findAll();
   }
 
   public Reimbursement updateReimbursement(Reimbursement r) {

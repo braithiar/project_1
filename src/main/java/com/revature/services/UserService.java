@@ -2,6 +2,7 @@ package com.revature.services;
 
 import com.revature.dao.RoleDAO;
 import com.revature.dao.UserDAO;
+import com.revature.exceptions.UserDoesNotExistException;
 import com.revature.models.Role;
 import com.revature.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,10 @@ public class UserService {
     Optional<User> returned = userDAO.findById(uid);
 
     if (returned.isPresent()) {
-      // TODO: log success
       return returned.get();
     }
 
-    // TODO: log failure
-    return null;
+    throw new UserDoesNotExistException(uid);
   }
 
   public Role getUserRoleById(int uid) {

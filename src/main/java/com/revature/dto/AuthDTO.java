@@ -1,23 +1,11 @@
 package com.revature.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@AllArgsConstructor
+@Data
 public class AuthDTO {
   private String token;
-  private final String tokenType;
-
-  public AuthDTO(String token) {
-    this.token = token;
-    tokenType = "Bearer";
-  }
-
-  public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
-
-  public String getTokenType() {
-    return tokenType;
-  }
+  private final String tokenType = "Bearer";
 }
