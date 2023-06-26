@@ -1,9 +1,11 @@
 package com.revature.services;
 
+import com.revature.dao.ExpenseTypeDAO;
 import com.revature.dao.ReimbursementDAO;
 import com.revature.dao.StatusDAO;
 import com.revature.dao.UserDAO;
 import com.revature.exceptions.*;
+import com.revature.models.ExpenseType;
 import com.revature.models.Reimbursement;
 import com.revature.models.Status;
 import com.revature.models.User;
@@ -17,13 +19,16 @@ public class ReimbursementService {
   private final UserDAO userDAO;
   private final ReimbursementDAO reimbDAO;
   private final StatusDAO statusDAO;
+  private final ExpenseTypeDAO expenseTypeDAO;
 
   @Autowired
   public ReimbursementService(UserDAO userDAO, ReimbursementDAO reimbDAO,
-                              StatusDAO statusDAO) {
+                              StatusDAO statusDAO,
+                              ExpenseTypeDAO expenseTypeDAO) {
     this.userDAO = userDAO;
     this.reimbDAO = reimbDAO;
     this.statusDAO = statusDAO;
+    this.expenseTypeDAO = expenseTypeDAO;
   }
 
   public Reimbursement createReimbursement(int uid, Reimbursement r) {
@@ -48,6 +53,10 @@ public class ReimbursementService {
 
     if (r.getDescription().isEmpty()) {
       throw new EmptyDescriptionException();
+    }
+
+    if (r.getType().getId() <= 0) {
+      throw new TypeDoesNotExistException();
     }
 
     newReimbursement = reimbDAO.save(r);
@@ -75,6 +84,22 @@ public class ReimbursementService {
     );
   }
 
+  public List<Reimbursement> getUserReimbursementsByType(User user,
+                                                         ExpenseType type) {
+    if (!userDAO.existsById(user.getId())) {
+      throw new UserDoesNotExistException(user.getId());
+    }
+
+    if (!expenseTypeDAO.existsById(type.getId())) {
+      throw new TypeDoesNotExistException();
+    }
+
+    return reimbDAO.findByUserAndExpenseType(
+      user,
+      type
+    );
+  }
+
   public List<Reimbursement> getAllUserReimbursements(User user) {
     if (!userDAO.existsById(user.getId())) {
       throw new UserDoesNotExistException(user.getId());
@@ -89,6 +114,14 @@ public class ReimbursementService {
     }
 
     return reimbDAO.findByStatus(status);
+  }
+
+  public List<Reimbursement> getAllReimbursementsByType(ExpenseType type) {
+    if (!expenseTypeDAO.existsById(type.getId())) {
+      throw new TypeDoesNotExistException();
+    }
+
+    return reimbDAO.findByExpenseType(type);
   }
 
   public List<Reimbursement> getAllReimbursements() {
