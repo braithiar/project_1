@@ -9,6 +9,7 @@ import com.revature.models.ExpenseType;
 import com.revature.models.Reimbursement;
 import com.revature.models.Status;
 import com.revature.models.User;
+import com.revature.ticketing.TicketQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,10 @@ public class ReimbursementService {
 
 
     newReimbursement = reimbDAO.save(r);
+
+    if (!TicketQueue.addTicket(newReimbursement)) {
+      throw new TicketAddException();
+    }
 
     if (newReimbursement.getId() > 0) {
       return newReimbursement;

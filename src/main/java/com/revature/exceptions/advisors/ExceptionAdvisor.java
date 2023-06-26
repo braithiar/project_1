@@ -1,5 +1,6 @@
-package com.revature.exceptions;
+package com.revature.exceptions.advisors;
 
+import com.revature.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -109,6 +110,17 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     body.put("timestamp", LocalDateTime.now());
     body.put("message", "Could not update reimbursement status");
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(TicketAddException.class)
+  public ResponseEntity<?> handleTypeDNEException(
+    TicketAddException tae, WebRequest wr) {
+    Map<String, Object> body = new HashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", "Could not add ticket to queue");
 
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
