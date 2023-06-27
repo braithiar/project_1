@@ -81,9 +81,9 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(TypeDoesNotExistException.class)
+  @ExceptionHandler(ExpenseTypeDoesNotExistException.class)
   public ResponseEntity<?> handleTypeDNEException(
-    TypeDoesNotExistException rdnee, WebRequest wr) {
+    ExpenseTypeDoesNotExistException rdnee, WebRequest wr) {
     Map<String, Object> body = new HashMap<>();
 
     body.put("timestamp", LocalDateTime.now());
@@ -103,9 +103,9 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
   }
 
-  @ExceptionHandler(FailedStatusUpdateException.class)
+  @ExceptionHandler(FailedToProcessTicketException.class)
   public ResponseEntity<?> handleTypeDNEException(
-    FailedStatusUpdateException fsue, WebRequest wr) {
+    FailedToProcessTicketException fsue, WebRequest wr) {
     Map<String, Object> body = new HashMap<>();
 
     body.put("timestamp", LocalDateTime.now());

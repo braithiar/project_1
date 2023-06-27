@@ -7,6 +7,7 @@ import com.revature.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Queue;
 
 public interface ReimbursementDAO extends
   JpaRepository<Reimbursement, Integer> {

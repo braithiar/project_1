@@ -9,7 +9,6 @@ import com.revature.models.ExpenseType;
 import com.revature.models.Reimbursement;
 import com.revature.models.Status;
 import com.revature.models.User;
-import com.revature.ticketing.TicketQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,13 +59,13 @@ public class ReimbursementService {
         !expenseTypeDAO.existsById(r.getType().getId()) ||
         expenseTypeDAO.findByType(r.getType().getType()).getId() !=
         r.getType().getId()) {
-      throw new TypeDoesNotExistException();
+      throw new ExpenseTypeDoesNotExistException();
     }
 
 
     newReimbursement = reimbDAO.save(r);
 
-    if (!TicketQueue.addTicket(newReimbursement)) {
+    if (!TicketService.addTicket(newReimbursement)) {
       throw new TicketAddException();
     }
 
@@ -100,7 +99,7 @@ public class ReimbursementService {
     }
 
     if (!expenseTypeDAO.existsById(type.getId())) {
-      throw new TypeDoesNotExistException();
+      throw new ExpenseTypeDoesNotExistException();
     }
 
     return reimbDAO.findByUserAndType(
@@ -127,7 +126,7 @@ public class ReimbursementService {
 
   public List<Reimbursement> getAllReimbursementsByType(ExpenseType type) {
     if (!expenseTypeDAO.existsById(type.getId())) {
-      throw new TypeDoesNotExistException();
+      throw new ExpenseTypeDoesNotExistException();
     }
 
     return reimbDAO.findByType(type);
@@ -138,14 +137,32 @@ public class ReimbursementService {
   }
 
   public Reimbursement updateReimbursementStatus(Reimbursement r) {
-    Status origStatus = reimbDAO.getReferenceById(r.getId()).getStatus();
+    Reimbursement original = TicketService.getTicket();
 
     // Reimbursements may not be edited after being processed
-    if (r != null && origStatus.getName() != "Approved" ||
-        origStatus.getName() != "Denied") {
-      return reimbDAO.save(r);
+    if (r != null && original != null &&
+        original.getStatus().getName().equals("Pending")) {
+
+      if (r.getStatus().equals(null)) {
+        throw new FailedToProcessTicketException("No status update was provided");
+      }
+
+      if (original.getId() != r.getId()) {
+        throw new FailedToProcessTicketException("Ticket ID mismatch");
+      }
+      original.setStatus(r.getStatus());
+
+      Reimbursement processed = reimbDAO.save(original);
+
+      if (processed != null &&
+          !processed.getStatus().getName().equals("Pending")) {
+        TicketService.removeTicket();
+        return processed;
+      }
+
+      throw new FailedToProcessTicketException("Ticket processing failed");
     }
 
-    throw new FailedStatusUpdateException();
+    throw new FailedToProcessTicketException();
   }
 }
