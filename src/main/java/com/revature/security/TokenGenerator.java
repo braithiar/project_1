@@ -1,5 +1,7 @@
 package com.revature.security;
 
+import com.revature.dao.UserDAO;
+import com.revature.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,21 +19,28 @@ import java.util.Date;
 public class TokenGenerator {
   private final int expiration;
   private final SecretKey secretKey;
+  private final UserDAO userDAO;
 
   @Autowired
   public TokenGenerator(@Value("${jwt.secret}") String secret,
-                        @Value("${jwt.expirationDateInMs}") int expiration) {
+                        @Value("${jwt.expirationDateInMs}") int expiration,
+                        UserDAO userDAO) {
     this.expiration = expiration;
     secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA512");
+    this.userDAO = userDAO;
   }
 
   public String generateToken(Authentication auth) {
     String username = auth.getName();
     Date current = new Date();
     Date expire = new Date(current.getTime() + expiration);
+    User user = userDAO.findByUsername(username);
+
 
     return Jwts.builder()
                .setSubject(username)
+               .claim("Id", user.getId())
+               .claim("Role", user.getRole().getTitle())
                .setIssuedAt(current)
                .setExpiration(expire)
                .signWith(secretKey, SignatureAlgorithm.HS512)
@@ -58,10 +67,10 @@ public class TokenGenerator {
     }
 
     Claims claims = Jwts.parserBuilder()
-      .setSigningKey(secretKey)
-      .build()
-      .parseClaimsJws(token)
-      .getBody();
+                        .setSigningKey(secretKey)
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
 
     return claims.getSubject();
   }

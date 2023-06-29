@@ -124,4 +124,15 @@ public class ExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(UsernameAlreadyInUseException.class)
+  public ResponseEntity<?> handleUsernameAlreadyInUseException(
+    UsernameAlreadyInUseException uiue, WebRequest wr) {
+    Map<String, Object> body = new HashMap<>();
+
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", "Username is already in use");
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
 }

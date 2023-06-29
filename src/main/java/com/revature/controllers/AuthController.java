@@ -5,6 +5,7 @@ import com.revature.dao.UserDAO;
 import com.revature.dto.AuthDTO;
 import com.revature.dto.LoginDTO;
 import com.revature.dto.RegisterDTO;
+import com.revature.exceptions.UsernameAlreadyInUseException;
 import com.revature.models.User;
 import com.revature.security.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
+@CrossOrigin(origins = "http://127.0.0.1:3000")
 public class AuthController {
   private final AuthenticationManager authManager;
   private final UserDAO userDAO;
@@ -41,10 +40,9 @@ public class AuthController {
   }
 
   @PostMapping("register")
-  public ResponseEntity<String> register(@RequestBody RegisterDTO registerDTO) {
+  public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
     if (userDAO.existsByUsername(registerDTO.getUsername())) {
-      return new ResponseEntity<>("That username is already in use.",
-                                  HttpStatus.BAD_REQUEST);
+      throw new UsernameAlreadyInUseException();
     }
 
     User user = new User(
@@ -56,10 +54,7 @@ public class AuthController {
 
     user.setRole(roleDAO.findRoleByTitle("Employee"));
 
-    userDAO.save(user);
-
-    return new ResponseEntity<>("User created successfully.",
-                                HttpStatus.CREATED);
+    return new ResponseEntity<>(userDAO.save(user), HttpStatus.CREATED);
   }
 
   @PostMapping("login")
