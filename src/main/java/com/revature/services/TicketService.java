@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +32,30 @@ public class TicketService {
     return pending.add(r);
   }
 
-  public static Reimbursement getTicket() {
-    return pending.get(0);
+  public static Reimbursement getTicket(int id) {
+    if (!pending.isEmpty()) {
+      for (Reimbursement r : pending) {
+        if (id == r.getId()) {
+          return r;
+        }
+      }
+    }
+
+    return null;
   }
 
-  public static Reimbursement removeTicket() {
-    Reimbursement statusCheck = pending.get(0);
+  public static Reimbursement removeTicket(int id) {
+    Reimbursement delete = null;
 
-    if (statusCheck.getStatus().getName().equals("Approved") ||
-        statusCheck.getStatus().getName().equals("Denied")) {
-      pending.remove(0);
+    for (Reimbursement r : pending) {
+      if (id == r.getId()) {
+        delete = r;
+        break;
+      }
+    }
+
+    if (delete.getStatus().getName() != "Pending") {
+      pending.remove(delete);
     }
 
     return null;

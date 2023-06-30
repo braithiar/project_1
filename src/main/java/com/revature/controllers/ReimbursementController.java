@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping()
+@CrossOrigin(origins = "http://127.0.0.1:3000")
 public class ReimbursementController {
   private final ReimbursementService reimbService;
   private final UserService userService;
@@ -234,6 +235,74 @@ public class ReimbursementController {
     return new ResponseEntity<>(reimbService.createReimbursement(
       user.getId(),
       r), HttpStatus.CREATED);
+  }
+
+  @GetMapping("/employee/reimbursements/travel")
+  public ResponseEntity<?> getUserTravelReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByType(
+      user,
+      expenseTypeDAO.findByType("Travel")
+    ), HttpStatus.OK);
+  }
+
+  @GetMapping("/employee/reimbursements/lodging")
+  public ResponseEntity<?> getUserLodgingReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByType(
+      user,
+      expenseTypeDAO.findByType("Lodging")
+    ), HttpStatus.OK);
+  }
+
+  @GetMapping("/employee/reimbursements/food")
+  public ResponseEntity<?> getUserFoodReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByType(
+      user,
+      expenseTypeDAO.findByType("Food")
+    ), HttpStatus.OK);
+  }
+
+  @GetMapping("/employee/reimbursements/other")
+  public ResponseEntity<?> getUserOtherReimbursementsHandler(
+    @RequestHeader("Authorization") String token) {
+    String username = tokenGenerator.getUsernameFromToken(token);
+    User user = userService.getUserByUsername(username);
+
+    if (token.isEmpty() || user == null) {
+      return new ResponseEntity<>("You must be logged in",
+                                  HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(reimbService.getUserReimbursementsByType(
+      user,
+      expenseTypeDAO.findByType("Other")
+    ), HttpStatus.OK);
   }
 
   @PutMapping("/reimbursements/status-update")

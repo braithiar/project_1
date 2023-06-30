@@ -137,7 +137,7 @@ public class ReimbursementService {
   }
 
   public Reimbursement updateReimbursementStatus(Reimbursement r) {
-    Reimbursement original = TicketService.getTicket();
+    Reimbursement original = TicketService.getTicket(r.getId());
 
     // Reimbursements may not be edited after being processed
     if (r != null && original != null &&
@@ -156,7 +156,7 @@ public class ReimbursementService {
 
       if (processed != null &&
           !processed.getStatus().getName().equals("Pending")) {
-        TicketService.removeTicket();
+        TicketService.removeTicket(processed.getId());
         return processed;
       }
 
