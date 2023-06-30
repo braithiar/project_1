@@ -22,7 +22,7 @@ const login = async () => {
     })
     .then((data) => {
       document.cookie = data.token;
-
+      console.log(data.message)
       if (parseJwt(data.token).Role === "Finance Manager") {
         window.location.href = "manager.html";
       } else {

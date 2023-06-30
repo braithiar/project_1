@@ -13,7 +13,7 @@ document.getElementById("reimbursement-header").innerText =
   "Welcome, " + user.sub + "!";
 
 window.onload = getReimbursements("/reimbursements");
-
+console.log(parseJwt(document.cookie))
 function makeRow(rowdata) {
   let row = document.createElement("tr");
 
@@ -49,7 +49,10 @@ async function getReimbursements(path) {
       "Content-Type": "application/json",
     },
   })
-    .then((response) => response.json())
+    .then((response) => {
+      console.log(`${url}${path}`)
+      return response.json();
+    })
     .then((data) => {
       console.log(data);
       data.map((reimb) => {
