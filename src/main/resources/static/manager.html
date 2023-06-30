@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <link href="css/styles.css" rel="stylesheet" />
+    <title>Manage Reimbursements</title>
+  </head>
+
+  <body class="">
+    <div
+      class="container-fluid text-center text-light background-gradient vh-100"
+    >
+      <div id="header-container" class="mb-5">
+        <h1 id="reimbursement-header" class="text-center">Welcome to Whatever</h1>
+      </div>
+      <div class="card p-2 d-flex shadow justify-content-center align-content-center">
+        <div class="form-group row">
+          <label for="status" class="form-label text-start mb-1 w-auto col-3">Status
+            <select name="status" id="status" class="select form-select d-inline-block mb-2">
+              <option value="All">All</option>
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Denied</option>
+            </select>
+          </label>
+          <label for="type" class="form-label text-start mb-1 w-auto col-3">Type
+            <select name="type" id="type" class="select form-select d-inline-block mb-2">
+              <option value="--">--</option>
+              <option>Travel</option>
+              <option>Lodging</option>
+              <option>Food</option>
+              <option>Other</option>
+            </select>
+          </label>
+        </div>
+        <button type="button" id="logout-btn" class="btn btn-outline-light align-self-end self component-bg mb-2">Back to Login</button>
+        <table id="reimbs" class="table table-bordered table-hover table-striped">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Employee</th>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Select</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+          </tbody>
+        </table>
+        <div class="btn-group w-75 component-bg m-auto">
+          <button type="button" id="approve-btn" class="btn btn-outline-light w-25">Approve</button>
+          <button type="button" id="deny-btn" class=" btn btn-outline-light w-25">Deny</button>
+        </div>
+        <button type="button" id="create-btn"
+          class="component-bg align-self-center btn btn-outline-light w-25 mt-4 mb-4">Create
+          Reimbursement</button>
+      </div>
+    </div>
+    <script src="scripts/reimb_manage.js" type="module"></script>
+    <script src="scripts/funcs.js" type="module"></script>
+  </body>
+</html>

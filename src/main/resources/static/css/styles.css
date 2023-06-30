@@ -1,0 +1,27 @@
+.background-gradient {
+  background: radial-gradient(#4174D9, #6610f2);
+}
+
+.component-bg {
+  background-color: #4F5954;
+}
+
+.link-color {
+  color: #D7D9D8;
+}
+
+input {
+  border: 2px solid ;
+}
+
+input:hover, input:focus, textarea:focus {
+ outline-color:#E5F2B6;
+}
+
+.select:focus {
+  border-color: #E5F2B6;
+}
+
+::placeholder {
+  color:#D7D9D8;
+}
